@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Snap — Snap Tech · Monodosis del Futuro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #060608;
+      --deep: #0d0d10;
+      --card: #111116;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --neon: #d4ff00;
+      --white: #f0efe8;
+      --muted: #5a5a65;
+      --border: rgba(201,168,76,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, background 0.2s;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.4s ease, opacity 0.3s;
+      transform: translate(-50%, -50%);
+      opacity: 0.5;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(201,168,76,0.08);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--gold);
+      padding: 0.6rem 1.4rem;
+      border: none;
+      cursor: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 0 3rem;
+      padding-top: 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(212,255,0,0.03) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .hero-left {
+      z-index: 1;
+      animation: fadeUp 1s ease both;
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 10vw, 9rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+    }
+
+    .hero-title .accent { color: var(--gold); }
+    .hero-title .outline {
+      -webkit-text-stroke: 1px var(--white);
+      color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1.2rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(240,239,232,0.6);
+      max-width: 38ch;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .btn-primary {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--gold);
+      padding: 1rem 2.5rem;
+      border: none;
+      cursor: none;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      background: var(--neon);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(212,255,0,0.2);
+    }
+
+    .btn-ghost {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: color 0.3s;
+    }
+    .btn-ghost:hover { color: var(--white); }
+    .btn-ghost::after {
+      content: '→';
+      transition: transform 0.3s;
+    }
+    .btn-ghost:hover::after { transform: translateX(4px); }
+
+    .hero-right {
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+
+    .sachet-stack {
+      position: relative;
+      width: 320px;
+      height: 480px;
+    }
+
+    .sachet-card {
+      position: absolute;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    }
+
+    .sachet-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .sachet-card.main {
+      width: 260px;
+      height: 380px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .sachet-card.back1 {
+      width: 220px;
+      height: 340px;
+      top: 40%;
+      left: 30%;
+      transform: translate(-50%, -50%) rotate(-8deg);
+      z-index: 2;
+      opacity: 0.5;
+    }
+
+    .sachet-card.back2 {
+      width: 200px;
+      height: 310px;
+      top: 55%;
+      left: 65%;
+      transform: translate(-50%, -50%) rotate(6deg);
+      z-index: 1;
+      opacity: 0.35;
+    }
+
+    .glow-orb {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    /* MARQUEE */
+    .marquee-section {
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee-track {
+      display: inline-flex;
+      animation: marquee 20s linear infinite;
+    }
+
+    .marquee-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      padding: 0 3rem;
+      text-transform: uppercase;
+    }
+
+    .marquee-dot {
+      color: var(--gold);
+      margin: 0 0.5rem;
+    }
+
+    /* STATS */
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 5rem 0;
+    }
+
+    .stat-item {
+      background: var(--black);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      transition: background 0.3s;
+    }
+    .stat-item:hover { background: var(--card); }
+
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4.5rem;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* HOW IT WORKS */
+    .section {
+      padding: 8rem 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-eyebrow::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 6vw, 6rem);
+      line-height: 0.92;
+      margin-bottom: 1rem;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 5rem;
+      background: var(--border);
+    }
+
+    .step-card {
+      background: var(--card);
+      padding: 3rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s ease;
+    }
+    .step-card:hover { transform: translateY(-4px); }
+    .step-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+    .step-card:hover::after { transform: scaleX(1); }
+
+    .step-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: rgba(201,168,76,0.12);
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.8rem;
+    }
+
+    .step-desc {
+      font-size: 0.95rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: rgba(240,239,232,0.55);
+    }
+
+    /* FEATURES */
+    .features-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .feature-item {
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      cursor: none;
+      transition: padding-left 0.3s;
+    }
+    .feature-item:hover { padding-left: 0.5rem; }
+
+    .feature-icon {
+      width: 2rem;
+      height: 2rem;
+      background: var(--border);
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin-top: 0.1rem;
+    }
+
+    .feature-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-desc {
+      font-size: 0.92rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: rgba(240,239,232,0.5);
+    }
+
+    .features-image {
+      position: relative;
+    }
+
+    .features-image img {
+      width: 100%;
+      height: 600px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .features-image::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border: 1px solid var(--border);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .img-tag {
+      position: absolute;
+      bottom: 2rem;
+      right: -1rem;
+      background: var(--gold);
+      color: var(--black);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.6rem 1.2rem;
+      z-index: 2;
+    }
+
+    /* SIZES */
+    .sizes-section {
+      background: var(--deep);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 8rem 3rem;
+    }
+
+    .sizes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 4rem;
+      background: var(--border);
+    }
+
+    .size-card {
+      background: var(--black);
+      padding: 3rem 2rem;
+      text-align: center;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .size-card:hover { background: var(--card); }
+    .size-card.featured { background: var(--card); }
+    .size-card.featured::before {
+      content: 'POPULAR';
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--black);
+      background: var(--neon);
+      padding: 0.25rem 0.6rem;
+    }
+
+    .size-range {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .size-dims {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .size-name {
+      font-size: 1rem;
+      font-weight: 300;
+      color: rgba(240,239,232,0.7);
+      font-style: italic;
+    }
+
+    /* GALLERY */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(2, 280px);
+      gap: 2px;
+      background: var(--border);
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      position: relative;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.05); }
+
+    .gallery-item:nth-child(1) { grid-column: span 5; }
+    .gallery-item:nth-child(2) { grid-column: span 4; }
+    .gallery-item:nth-child(3) { grid-column: span 3; }
+    .gallery-item:nth-child(4) { grid-column: span 3; }
+    .gallery-item:nth-child(5) { grid-column: span 5; }
+    .gallery-item:nth-child(6) { grid-column: span 4; }
+
+    /* CTA */
+    .cta-section {
+      padding: 10rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(201,168,76,0.07) 0%, transparent 70%);
+    }
+
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 8vw, 8rem);
+      line-height: 0.9;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .cta-sub {
+      font-size: 1.15rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(240,239,232,0.5);
+      max-width: 50ch;
+      margin: 0 auto 3.5rem;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    .cta-form {
+      display: flex;
+      gap: 0;
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .cta-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-right: none;
+      padding: 1rem 1.5rem;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .cta-input::placeholder { color: var(--muted); }
+    .cta-input:focus { border-color: var(--gold); }
+
+    .cta-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      padding: 1rem 1.8rem;
+      cursor: none;
+      font-weight: 400;
+      transition: background 0.3s;
+    }
+    .cta-btn:hover { background: var(--neon); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.15em;
+    }
+    .footer-logo span { color: var(--gold); }
+
+    .footer-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ANIMATIONS */
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50% { transform: translate(-50%, -50%) translateY(-16px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(25px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 6rem 1.5rem 3rem;
+        text-align: center;
+      }
+      .hero-eyebrow { justify-content: center; }
+      .hero-actions { justify-content: center; }
+      .hero-right { display: none; }
+
+      .stats-section { grid-template-columns: 1fr; }
+
+      .section { padding: 5rem 1.5rem; }
+
+      .steps-grid { grid-template-columns: 1fr; }
+
+      .features-layout { grid-template-columns: 1fr; }
+      .features-image { display: none; }
+
+      .sizes-section { padding: 5rem 1.5rem; }
+      .sizes-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+      }
+      .gallery-item { grid-column: span 1 !important; height: 200px; }
+
+      .cta-section { padding: 5rem 1.5rem; }
+      .cta-form { flex-direction: column; }
+      .cta-input { border-right: 1px solid var(--border); border-bottom: none; }
+
+      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Simple<span>Snap</span></a>
+    <ul class="nav-links">
+      <li><a href="#tecnologia">Snap Tech</a></li>
+      <li><a href="#como">Cómo funciona</a></li>
+      <li><a href="#tamaños">Tamaños</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <button class="nav-cta">Solicitar muestras</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-noise"></div>
+    <div class="hero-left">
+      <p class="hero-eyebrow">Snap Tech · México · Monodosis</p>
+      <h1 class="hero-title">
+        EL<br>
+        <span class="accent">FUTURO</span><br>
+        <span class="outline">DEL SACHET</span>
+      </h1>
+      <p class="hero-sub">
+        Una dosis perfecta, cada vez. Simple Snap redefine cómo el mundo consume lo que más le importa — sin desperdicio, sin compromiso.
+      </p>
+      <div class="hero-actions">
+        <a href="#contacto" class="btn-primary">Quiero ser parte</a>
+        <a href="#tecnologia" class="btn-ghost">Ver tecnología</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="sachet-stack">
+        <div class="glow-orb"></div>
+        <div class="sachet-card back1">
+          <img src="DSC06742.jpg" alt="Sachet lifestyle" />
+        </div>
+        <div class="sachet-card back2">
+          <img src="DSC06776.jpg" alt="Sachet uso" />
+        </div>
+        <div class="sachet-card main">
+          <img src="3-IMG_5830.jpg" alt="Simple Snap sachet" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span class="marquee-item">Snap Tech <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Monodosis <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">100% Reciclable <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Innovación México <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Zero Desperdicio <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Dosis Perfecta <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Simple Snap <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Snap Tech <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Monodosis <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">100% Reciclable <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Innovación México <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Zero Desperdicio <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Dosis Perfecta <span class="marquee-dot">·</span></span>
+      <span class="marquee-item">Simple Snap <span class="marquee-dot">·</span></span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-section reveal">
+    <div class="stat-item">
+      <div class="stat-number">0.5ml</div>
+      <div class="stat-label">Dosis mínima exacta</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Material reciclable</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">12ml</div>
+      <div class="stat-label">Capacidad máxima</div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="como">
+    <div class="reveal">
+      <p class="section-eyebrow">Snap Tech</p>
+      <h2 class="section-title">TRES PASOS.<br>UNA REVOLUCIÓN.</h2>
+    </div>
+    <div class="steps-grid reveal">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <h3 class="step-title">Dobla</h3>
+        <p class="step-desc">El sachet se dobla fácilmente con una sola mano. El diseño ergonómico permite abrirlo sin esfuerzo, sin tijeras, sin complicaciones.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <h3 class="step-title">Snap</h3>
+        <p class="step-desc">Un clic preciso libera la dosis exacta. La tecnología Snap Tech garantiza que el contenido fluya de manera controlada, sin derrames.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <h3 class="step-title">Listo</h3>
+        <p class="step-desc">Disfruta tu producto al 100%. Sin residuos, sin merma. La dosis perfecta cada vez — porque tu producto vale demasiado para desperdiciarlo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="tecnologia" style="padding-top:0">
+    <div class="features-layout">
+      <div class="features-image reveal">
+        <img src="DSC06776.jpg" alt="Simple Snap en uso" />
+        <div class="img-tag">Snap Tech · Patentado</div>
+      </div>
+      <div>
+        <div class="reveal">
+          <p class="section-eyebrow">Por qué Simple Snap</p>
+          <h2 class="section-title">DISEÑADO PARA<br>DESTACAR.</h2>
+        </div>
+        <div class="features-list">
+          <div class="feature-item reveal">
+            <div class="feature-icon">◈</div>
+            <div>
+              <h4 class="feature-title">Dosis exacta siempre</h4>
+              <p class="feature-desc">Cada sachet contiene exactamente lo que necesitas — ni más, ni menos. Adiós al desperdicio, hola a la precisión.</p>
+            </div>
+          </div>
+          <div class="feature-item reveal">
+            <div class="feature-icon">◎</div>
+            <div>
+              <h4 class="feature-title">Portabilidad total</h4>
+              <p class="feature-desc">Cabe en cualquier bolsillo, bolso o neceser. Lleva tu rutina a cualquier lugar sin comprometer el formato ni la calidad.</p>
+            </div>
+          </div>
+          <div class="feature-item reveal">
+            <div class="feature-icon">◉</div>
+            <div>
+              <h4 class="feature-title">100% reciclable</h4>
+              <p class="feature-desc">Material homopolímero innovador desarrollado por V-Shapes. Comprometido con el planeta sin sacrificar desempeño.</p>
+            </div>
+          </div>
+          <div class="feature-item reveal">
+            <div class="feature-icon">◆</div>
+            <div>
+              <h4 class="feature-title">Imagen premium</h4>
+              <p class="feature-desc">Impresión de alta definición que hace que tu marca brille. El sachet más cool que jamás hayas tenido en la mano.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <div class="sizes-section" id="tamaños">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div class="reveal">
+        <p class="section-eyebrow">Formatos disponibles</p>
+        <h2 class="section-title">ENCUENTRA<br>TU TAMAÑO.</h2>
+      </div>
+      <div class="sizes-grid reveal">
+        <div class="size-card">
+          <div class="size-range">0.5 – 2ml</div>
+          <div class="size-dims">40 × 50 mm</div>
+          <div class="size-name">Micro · Muestras & Travel</div>
+        </div>
+        <div class="size-card featured">
+          <div class="size-range">1.5 – 3ml</div>
+          <div class="size-dims">40 × 80 mm</div>
+          <div class="size-name">Classic · El más versátil</div>
+        </div>
+        <div class="size-card">
+          <div class="size-range">1.5 – 5ml</div>
+          <div class="size-dims">50 × 80 mm</div>
+          <div class="size-name">Medium · Uso diario</div>
+        </div>
+        <div class="size-card">
+          <div class="size-range">4 – 12ml</div>
+          <div class="size-dims">60 × 100 mm</div>
+          <div class="size-name">Maxi · Nutrición & Wellness</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <section class="section">
+    <div class="reveal">
+      <p class="section-eyebrow">En acción</p>
+      <h2 class="section-title" style="margin-bottom:3rem">EL SACHET<br>QUE SE NOTA.</h2>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item">
+        <img src="3-IMG_5830.jpg" alt="Sachet en bolso amarillo" />
+      </div>
+      <div class="gallery-item">
+        <img src="DSC06742.jpg" alt="Sachet lifestyle" />
+      </div>
+      <div class="gallery-item">
+        <img src="DSC06776.jpg" alt="Sachet aplicación" />
+      </div>
+      <div class="gallery-item">
+        <img src="DSC06776.jpg" alt="Sachet detail" />
+      </div>
+      <div class="gallery-item">
+        <img src="DSC06742.jpg" alt="Sachet uso femenino" />
+      </div>
+      <div class="gallery-item">
+        <img src="3-IMG_5830.jpg" alt="Simple Snap pack" />
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="contacto">
+    <h2 class="cta-title reveal">
+      ¿LISTO PARA<br>
+      <span style="color:var(--gold)">DIFERENCIARTE?</span>
+    </h2>
+    <p class="cta-sub reveal">
+      Únete a las marcas que ya entendieron que el futuro del packaging no es más grande — es más inteligente.
+    </p>
+    <div class="cta-form reveal">
+      <input class="cta-input" type="email" placeholder="tu@email.com" />
+      <button class="cta-btn">Quiero info</button>
+    </div>
+    <p style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);margin-top:1.5rem;text-transform:uppercase;" class="reveal">
+      Sin spam · Solo lo que importa
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Simple<span>Snap</span></div>
+    <p class="footer-copy">© 2025 Simple Snap · Snap Tech · México</p>
+    <ul class="footer-links">
+      <li><a href="#">Privacidad</a></li>
+      <li><a href="#">Contacto</a></li>
+      <li><a href="https://v-shapes.com" target="_blank">V-Shapes</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button, .feature-item, .step-card, .size-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform += ' scale(1.8)';
+        cursor.style.background = 'var(--neon)';
+        ring.style.opacity = '0';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.background = 'var(--gold)';
+        ring.style.opacity = '0.5';
+      });
+    });
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    revealEls.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
