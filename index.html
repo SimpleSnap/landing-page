@@ -1,1105 +1,985 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple Snap — Snap Tech · Monodosis del Futuro</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --black: #060608;
-      --deep: #0d0d10;
-      --card: #111116;
-      --gold: #c9a84c;
-      --gold-light: #e8c97a;
-      --neon: #d4ff00;
-      --white: #f0efe8;
-      --muted: #5a5a65;
-      --border: rgba(201,168,76,0.2);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'Cormorant Garamond', serif;
-      overflow-x: hidden;
-      cursor: none;
-    }
-
-    /* CUSTOM CURSOR */
-    .cursor {
-      width: 12px; height: 12px;
-      background: var(--gold);
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      transition: transform 0.15s ease, background 0.2s;
-      transform: translate(-50%, -50%);
-    }
-    .cursor-ring {
-      width: 36px; height: 36px;
-      border: 1px solid var(--gold);
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 9998;
-      transition: transform 0.4s ease, opacity 0.3s;
-      transform: translate(-50%, -50%);
-      opacity: 0.5;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 3rem;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(201,168,76,0.08);
-    }
-
-    .nav-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem;
-      letter-spacing: 0.15em;
-      color: var(--white);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--gold); }
-
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      list-style: none;
-    }
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--gold); }
-
-    .nav-cta {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--black);
-      background: var(--gold);
-      padding: 0.6rem 1.4rem;
-      border: none;
-      cursor: none;
-      transition: background 0.3s, transform 0.2s;
-    }
-    .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      padding: 0 3rem;
-      padding-top: 6rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(212,255,0,0.03) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .hero-noise {
-      position: absolute;
-      inset: 0;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-
-    .hero-left {
-      z-index: 1;
-      animation: fadeUp 1s ease both;
-    }
-
-    .hero-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .hero-eyebrow::before {
-      content: '';
-      display: block;
-      width: 2rem;
-      height: 1px;
-      background: var(--gold);
-    }
-
-    .hero-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(5rem, 10vw, 9rem);
-      line-height: 0.9;
-      letter-spacing: 0.02em;
-      margin-bottom: 2rem;
-    }
-
-    .hero-title .accent { color: var(--gold); }
-    .hero-title .outline {
-      -webkit-text-stroke: 1px var(--white);
-      color: transparent;
-    }
-
-    .hero-sub {
-      font-size: 1.2rem;
-      font-weight: 300;
-      font-style: italic;
-      color: rgba(240,239,232,0.6);
-      max-width: 38ch;
-      line-height: 1.7;
-      margin-bottom: 3rem;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .btn-primary {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--black);
-      background: var(--gold);
-      padding: 1rem 2.5rem;
-      border: none;
-      cursor: none;
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-primary:hover {
-      background: var(--neon);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(212,255,0,0.2);
-    }
-
-    .btn-ghost {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      transition: color 0.3s;
-    }
-    .btn-ghost:hover { color: var(--white); }
-    .btn-ghost::after {
-      content: '→';
-      transition: transform 0.3s;
-    }
-    .btn-ghost:hover::after { transform: translateX(4px); }
-
-    .hero-right {
-      z-index: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeUp 1s 0.3s ease both;
-    }
-
-    .sachet-stack {
-      position: relative;
-      width: 320px;
-      height: 480px;
-    }
-
-    .sachet-card {
-      position: absolute;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-    }
-
-    .sachet-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .sachet-card.main {
-      width: 260px;
-      height: 380px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 3;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .sachet-card.back1 {
-      width: 220px;
-      height: 340px;
-      top: 40%;
-      left: 30%;
-      transform: translate(-50%, -50%) rotate(-8deg);
-      z-index: 2;
-      opacity: 0.5;
-    }
-
-    .sachet-card.back2 {
-      width: 200px;
-      height: 310px;
-      top: 55%;
-      left: 65%;
-      transform: translate(-50%, -50%) rotate(6deg);
-      z-index: 1;
-      opacity: 0.35;
-    }
-
-    .glow-orb {
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      animation: pulse 4s ease-in-out infinite;
-    }
-
-    /* MARQUEE */
-    .marquee-section {
-      padding: 1.5rem 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .marquee-track {
-      display: inline-flex;
-      animation: marquee 20s linear infinite;
-    }
-
-    .marquee-item {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      padding: 0 3rem;
-      text-transform: uppercase;
-    }
-
-    .marquee-dot {
-      color: var(--gold);
-      margin: 0 0.5rem;
-    }
-
-    /* STATS */
-    .stats-section {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      margin: 5rem 0;
-    }
-
-    .stat-item {
-      background: var(--black);
-      padding: 3rem 2.5rem;
-      text-align: center;
-      transition: background 0.3s;
-    }
-    .stat-item:hover { background: var(--card); }
-
-    .stat-number {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 4.5rem;
-      color: var(--gold);
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    /* HOW IT WORKS */
-    .section {
-      padding: 8rem 3rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .section-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .section-eyebrow::before {
-      content: '';
-      display: block;
-      width: 2rem;
-      height: 1px;
-      background: var(--gold);
-    }
-
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3.5rem, 6vw, 6rem);
-      line-height: 0.92;
-      margin-bottom: 1rem;
-    }
-
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-top: 5rem;
-      background: var(--border);
-    }
-
-    .step-card {
-      background: var(--card);
-      padding: 3rem 2.5rem;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.4s ease;
-    }
-    .step-card:hover { transform: translateY(-4px); }
-    .step-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--gold);
-      transform: scaleX(0);
-      transition: transform 0.4s ease;
-    }
-    .step-card:hover::after { transform: scaleX(1); }
-
-    .step-number {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 5rem;
-      color: rgba(201,168,76,0.12);
-      line-height: 1;
-      margin-bottom: 1.5rem;
-    }
-
-    .step-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.8rem;
-    }
-
-    .step-desc {
-      font-size: 0.95rem;
-      font-weight: 300;
-      line-height: 1.7;
-      color: rgba(240,239,232,0.55);
-    }
-
-    /* FEATURES */
-    .features-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6rem;
-      align-items: center;
-    }
-
-    .features-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .feature-item {
-      padding: 2rem 0;
-      border-bottom: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 1.5rem;
-      align-items: start;
-      cursor: none;
-      transition: padding-left 0.3s;
-    }
-    .feature-item:hover { padding-left: 0.5rem; }
-
-    .feature-icon {
-      width: 2rem;
-      height: 2rem;
-      background: var(--border);
-      border: 1px solid var(--gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      margin-top: 0.1rem;
-    }
-
-    .feature-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.4rem;
-    }
-
-    .feature-desc {
-      font-size: 0.92rem;
-      font-weight: 300;
-      line-height: 1.7;
-      color: rgba(240,239,232,0.5);
-    }
-
-    .features-image {
-      position: relative;
-    }
-
-    .features-image img {
-      width: 100%;
-      height: 600px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .features-image::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border: 1px solid var(--border);
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .img-tag {
-      position: absolute;
-      bottom: 2rem;
-      right: -1rem;
-      background: var(--gold);
-      color: var(--black);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 0.6rem 1.2rem;
-      z-index: 2;
-    }
-
-    /* SIZES */
-    .sizes-section {
-      background: var(--deep);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 8rem 3rem;
-    }
-
-    .sizes-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
-      margin-top: 4rem;
-      background: var(--border);
-    }
-
-    .size-card {
-      background: var(--black);
-      padding: 3rem 2rem;
-      text-align: center;
-      transition: background 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-    .size-card:hover { background: var(--card); }
-    .size-card.featured { background: var(--card); }
-    .size-card.featured::before {
-      content: 'POPULAR';
-      position: absolute;
-      top: 1rem; right: 1rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      color: var(--black);
-      background: var(--neon);
-      padding: 0.25rem 0.6rem;
-    }
-
-    .size-range {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.5rem;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
-    }
-
-    .size-dims {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-    }
-
-    .size-name {
-      font-size: 1rem;
-      font-weight: 300;
-      color: rgba(240,239,232,0.7);
-      font-style: italic;
-    }
-
-    /* GALLERY */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: repeat(2, 280px);
-      gap: 2px;
-      background: var(--border);
-    }
-
-    .gallery-item {
-      overflow: hidden;
-      position: relative;
-    }
-    .gallery-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.6s ease;
-    }
-    .gallery-item:hover img { transform: scale(1.05); }
-
-    .gallery-item:nth-child(1) { grid-column: span 5; }
-    .gallery-item:nth-child(2) { grid-column: span 4; }
-    .gallery-item:nth-child(3) { grid-column: span 3; }
-    .gallery-item:nth-child(4) { grid-column: span 3; }
-    .gallery-item:nth-child(5) { grid-column: span 5; }
-    .gallery-item:nth-child(6) { grid-column: span 4; }
-
-    /* CTA */
-    .cta-section {
-      padding: 10rem 3rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(201,168,76,0.07) 0%, transparent 70%);
-    }
-
-    .cta-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(4rem, 8vw, 8rem);
-      line-height: 0.9;
-      margin-bottom: 2rem;
-      position: relative;
-    }
-
-    .cta-sub {
-      font-size: 1.15rem;
-      font-weight: 300;
-      font-style: italic;
-      color: rgba(240,239,232,0.5);
-      max-width: 50ch;
-      margin: 0 auto 3.5rem;
-      line-height: 1.7;
-      position: relative;
-    }
-
-    .cta-form {
-      display: flex;
-      gap: 0;
-      max-width: 420px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .cta-input {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-right: none;
-      padding: 1rem 1.5rem;
-      color: var(--white);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .cta-input::placeholder { color: var(--muted); }
-    .cta-input:focus { border-color: var(--gold); }
-
-    .cta-btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      background: var(--gold);
-      color: var(--black);
-      border: none;
-      padding: 1rem 1.8rem;
-      cursor: none;
-      font-weight: 400;
-      transition: background 0.3s;
-    }
-    .cta-btn:hover { background: var(--neon); }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.15em;
-    }
-    .footer-logo span { color: var(--gold); }
-
-    .footer-copy {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-    .footer-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .footer-links a:hover { color: var(--gold); }
-
-    /* ANIMATIONS */
-    @keyframes float {
-      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-      50% { transform: translate(-50%, -50%) translateY(-16px); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-
-    /* SCROLL REVEAL */
-    .reveal {
-      opacity: 0;
-      transform: translateY(25px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      nav { padding: 1.2rem 1.5rem; }
-      .nav-links { display: none; }
-
-      .hero {
-        grid-template-columns: 1fr;
-        padding: 6rem 1.5rem 3rem;
-        text-align: center;
-      }
-      .hero-eyebrow { justify-content: center; }
-      .hero-actions { justify-content: center; }
-      .hero-right { display: none; }
-
-      .stats-section { grid-template-columns: 1fr; }
-
-      .section { padding: 5rem 1.5rem; }
-
-      .steps-grid { grid-template-columns: 1fr; }
-
-      .features-layout { grid-template-columns: 1fr; }
-      .features-image { display: none; }
-
-      .sizes-section { padding: 5rem 1.5rem; }
-      .sizes-grid { grid-template-columns: repeat(2, 1fr); }
-
-      .gallery-grid {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-      }
-      .gallery-item { grid-column: span 1 !important; height: 200px; }
-
-      .cta-section { padding: 5rem 1.5rem; }
-      .cta-form { flex-direction: column; }
-      .cta-input { border-right: 1px solid var(--border); border-bottom: none; }
-
-      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Snap — Monodosis del Futuro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #000000;
+    --deep: #020408;
+    --navy: #0A1F44;
+    --blue: #0F3D91;
+    --sky: #3FA9F5;
+    --sky-dim: rgba(63,169,245,0.15);
+    --sky-glow: rgba(63,169,245,0.35);
+    --white: #F0F4FF;
+    --muted: rgba(240,244,255,0.45);
+    --grid: rgba(63,169,245,0.04);
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--deep);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--sky);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width .2s, height .2s, opacity .2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid rgba(63,169,245,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform .12s ease-out, width .3s, height .3s;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* GRID BACKGROUND */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 24px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(180deg, rgba(2,4,8,0.95) 0%, transparent 100%);
+    backdrop-filter: blur(0px);
+    transition: backdrop-filter .4s, background .4s;
+  }
+  nav.scrolled {
+    backdrop-filter: blur(20px);
+    background: rgba(2,4,8,0.85);
+    border-bottom: 1px solid rgba(63,169,245,0.1);
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--white);
+  }
+  .logo span { color: var(--sky); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 13px; font-weight: 400; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--muted);
+    text-decoration: none; transition: color .25s;
+  }
+  .nav-links a:hover { color: var(--sky); }
+  .nav-cta {
+    font-size: 13px; font-weight: 500; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--sky);
+    text-decoration: none; padding: 10px 24px;
+    border: 1px solid var(--sky); border-radius: 2px;
+    transition: background .25s, color .25s;
+  }
+  .nav-cta:hover { background: var(--sky); color: var(--black); }
+
+  /* SECTIONS BASE */
+  section { position: relative; z-index: 1; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    overflow: hidden;
+  }
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(15,61,145,0.6) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%);
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(63,169,245,0.25) 0%, transparent 70%);
+    bottom: 100px; right: 10%;
+    animation: orbFloat 12s ease-in-out infinite reverse;
+  }
+  .orb-3 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(63,169,245,0.2) 0%, transparent 70%);
+    top: 30%; left: 5%;
+    animation: orbFloat 10s ease-in-out infinite;
+  }
+  @keyframes orbFloat {
+    0%,100% { transform: translateY(0) translateX(-50%); }
+    50% { transform: translateY(-30px) translateX(-50%); }
+  }
+  .orb-2, .orb-3 { animation: orbFloat2 10s ease-in-out infinite; }
+  @keyframes orbFloat2 {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 20px; margin-bottom: 48px;
+    border: 1px solid rgba(63,169,245,0.3);
+    border-radius: 100px;
+    font-size: 11px; font-weight: 500; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--sky);
+    background: rgba(63,169,245,0.06);
+    backdrop-filter: blur(10px);
+    opacity: 0; animation: fadeUp .8s .2s forwards;
+  }
+  .hero-badge::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--sky); border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.8); }
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(52px, 8vw, 110px);
+    font-weight: 800; line-height: .92;
+    letter-spacing: -3px;
+    margin-bottom: 32px;
+    opacity: 0; animation: fadeUp .9s .4s forwards;
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--white) 0%, var(--sky) 60%, #1a6fc4 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: var(--font-display);
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 500; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 28px;
+    opacity: 0; animation: fadeUp .9s .6s forwards;
+  }
+
+  .hero-desc {
+    max-width: 520px;
+    font-size: clamp(15px, 1.5vw, 17px);
+    font-weight: 300; line-height: 1.7;
+    color: rgba(240,244,255,0.6);
+    margin: 0 auto 56px;
+    opacity: 0; animation: fadeUp .9s .75s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp .9s .9s forwards;
+  }
+
+  .btn-primary {
+    padding: 16px 40px;
+    background: var(--sky);
+    color: var(--black);
+    font-family: var(--font-display);
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    text-decoration: none; border: none; border-radius: 2px;
+    cursor: none; position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .3s;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.25) 60%);
+    transform: translateX(-100%);
+    transition: transform .4s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 60px rgba(63,169,245,0.4); }
+  .btn-primary:hover::after { transform: translateX(100%); }
+
+  .btn-ghost {
+    padding: 16px 40px;
+    background: transparent;
+    color: var(--white);
+    font-family: var(--font-display);
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    text-decoration: none; border: 1px solid rgba(240,244,255,0.2);
+    border-radius: 2px; cursor: none;
+    transition: border-color .25s, color .25s, background .25s;
+  }
+  .btn-ghost:hover { border-color: var(--sky); color: var(--sky); background: rgba(63,169,245,0.05); }
+
+  /* SCROLL INDICATOR */
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-hint span {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(240,244,255,0.3);
+  }
+  .scroll-line {
+    width: 1px; height: 48px;
+    background: linear-gradient(180deg, var(--sky), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%,100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* PRODUCT MOCKUP */
+  #mockup {
+    padding: 120px 60px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--sky);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800; letter-spacing: -1.5px;
+    text-align: center; margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 15px; color: var(--muted); text-align: center;
+    max-width: 480px; margin: 0 auto 80px; line-height: 1.7;
+  }
+
+  .mockup-stage {
+    position: relative;
+    width: 100%; max-width: 900px;
+    height: 500px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mockup-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(15,61,145,0.5) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* CSS SACHET MOCKUP */
+  .sachet-group {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 30px; position: relative; z-index: 2;
+  }
+  .sachet {
+    position: relative;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(10,31,68,0.9) 0%, rgba(15,61,145,0.7) 50%, rgba(10,31,68,0.9) 100%);
+    border: 1px solid rgba(63,169,245,0.4);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    box-shadow:
+      0 0 30px rgba(63,169,245,0.15),
+      0 0 80px rgba(15,61,145,0.3),
+      inset 0 1px 0 rgba(63,169,245,0.3);
+    overflow: hidden;
+    transition: transform .3s, box-shadow .3s;
+    cursor: none;
+  }
+  .sachet:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow:
+      0 0 60px rgba(63,169,245,0.35),
+      0 0 120px rgba(15,61,145,0.4),
+      inset 0 1px 0 rgba(63,169,245,0.5);
+  }
+  .sachet::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(63,169,245,0.08) 0%, transparent 60%);
+  }
+  .sachet::after {
+    content: ''; position: absolute;
+    left: 0; right: 0; top: 8px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 5%, rgba(63,169,245,0.5) 30%, rgba(63,169,245,0.8) 50%, rgba(63,169,245,0.5) 70%, transparent 95%);
+  }
+  .sachet-bottom-seal {
+    position: absolute; left: 0; right: 0; bottom: 8px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 5%, rgba(63,169,245,0.5) 30%, rgba(63,169,245,0.8) 50%, rgba(63,169,245,0.5) 70%, transparent 95%);
+  }
+  .sachet-logo {
+    font-family: var(--font-display);
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 2px; color: rgba(63,169,245,0.9);
+    text-transform: uppercase; z-index: 1;
+  }
+  .sachet-vol {
+    font-size: 22px; font-weight: 700; font-family: var(--font-display);
+    color: var(--white); z-index: 1; letter-spacing: -0.5px;
+  }
+  .sachet-dim {
+    font-size: 9px; color: rgba(240,244,255,0.4);
+    letter-spacing: 1px; z-index: 1;
+  }
+  .sachet-shine {
+    position: absolute; top: 0; right: 0;
+    width: 30%; height: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+  }
+  .s1 { width: 70px; height: 110px; }
+  .s2 { width: 70px; height: 165px; }
+  .s3 { width: 85px; height: 165px; transform: scale(1.05); }
+  .s4 { width: 100px; height: 200px; }
+
+  /* FLOATING PARTICLES */
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--sky);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFloat linear infinite;
+    opacity: 0;
+  }
+  @keyframes particleFloat {
+    0% { opacity: 0; transform: translateY(0); }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-200px); }
+  }
+
+  /* FORMATS SECTION */
+  #formats {
+    padding: 120px 60px;
+    background: linear-gradient(180deg, transparent 0%, rgba(10,31,68,0.15) 50%, transparent 100%);
+  }
+  .formats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .format-card {
+    position: relative;
+    padding: 36px 28px;
+    border: 1px solid rgba(63,169,245,0.15);
+    border-radius: 4px;
+    background: rgba(10,31,68,0.2);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    cursor: none;
+  }
+  .format-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at top left, rgba(63,169,245,0.1) 0%, transparent 60%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .format-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(63,169,245,0.5);
+    box-shadow: 0 20px 60px rgba(63,169,245,0.12), 0 0 0 1px rgba(63,169,245,0.2);
+  }
+  .format-card:hover::before { opacity: 1; }
+  .format-num {
+    font-family: var(--font-display);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; color: var(--sky);
+    text-transform: uppercase; margin-bottom: 20px;
+  }
+  .format-vol {
+    font-family: var(--font-display);
+    font-size: 48px; font-weight: 800;
+    letter-spacing: -2px; line-height: 1;
+    color: var(--white); margin-bottom: 4px;
+  }
+  .format-vol sub {
+    font-size: 18px; font-weight: 400; vertical-align: baseline; color: var(--muted);
+  }
+  .format-dim {
+    font-size: 13px; color: var(--muted); margin-bottom: 24px;
+  }
+  .format-bar {
+    height: 1px;
+    background: linear-gradient(90deg, var(--sky), transparent);
+    margin-bottom: 20px;
+    transform: scaleX(0.3); transform-origin: left;
+    transition: transform .4s .1s;
+  }
+  .format-card:hover .format-bar { transform: scaleX(1); }
+  .format-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; padding: 5px 12px;
+    border: 1px solid rgba(63,169,245,0.25);
+    border-radius: 2px; color: var(--sky);
+  }
+  .format-card.featured {
+    border-color: rgba(63,169,245,0.35);
+    background: rgba(15,61,145,0.2);
+  }
+  .format-card.featured::after {
+    content: 'POPULAR'; position: absolute; top: 20px; right: 20px;
+    font-size: 9px; font-weight: 700; letter-spacing: 2px;
+    color: var(--black); background: var(--sky);
+    padding: 4px 10px; border-radius: 2px;
+  }
+
+  /* WHY SECTION */
+  #why {
+    padding: 120px 60px;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    max-width: 1100px;
+    margin: 0 auto;
+    border: 1px solid rgba(63,169,245,0.1);
+    background: rgba(63,169,245,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .why-card {
+    padding: 52px 44px;
+    background: var(--deep);
+    position: relative; overflow: hidden;
+    transition: background .3s;
+  }
+  .why-card:hover { background: rgba(10,31,68,0.4); }
+  .why-card::before {
+    content: ''; position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(63,169,245,0.08) 0%, transparent 70%);
+    top: -60px; left: -60px;
+    opacity: 0; transition: opacity .4s;
+  }
+  .why-card:hover::before { opacity: 1; }
+  .why-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .why-icon svg { width: 100%; height: 100%; }
+  .why-title {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -0.5px; margin-bottom: 14px;
+  }
+  .why-desc {
+    font-size: 14px; line-height: 1.75;
+    color: rgba(240,244,255,0.5); font-weight: 300;
+  }
+  .why-num {
+    position: absolute; top: 28px; right: 28px;
+    font-family: var(--font-display);
+    font-size: 56px; font-weight: 800;
+    color: rgba(63,169,245,0.05); line-height: 1;
+    pointer-events: none;
+  }
+
+  /* CTA SECTION */
+  #cta {
+    padding: 160px 60px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  #cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(10,31,68,0.6) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-line {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 120px;
+    background: linear-gradient(180deg, transparent, var(--sky));
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 800; letter-spacing: -2px;
+    line-height: 1; margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+  .cta-sub {
+    font-size: 16px; color: var(--muted);
+    margin-bottom: 56px; position: relative; z-index: 1;
+    font-weight: 300; line-height: 1.7;
+  }
+  .cta-actions { position: relative; z-index: 1; }
+
+  /* STATS STRIP */
+  .stats-strip {
+    display: flex; justify-content: center;
+    gap: 0; flex-wrap: wrap;
+    max-width: 900px; margin: 0 auto 100px;
+    border: 1px solid rgba(63,169,245,0.1);
+    border-radius: 4px; overflow: hidden;
+  }
+  .stat-item {
+    flex: 1; min-width: 180px;
+    padding: 40px 32px; text-align: center;
+    border-right: 1px solid rgba(63,169,245,0.1);
+    background: rgba(10,31,68,0.1);
+    transition: background .3s;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item:hover { background: rgba(10,31,68,0.35); }
+  .stat-val {
+    font-family: var(--font-display);
+    font-size: 42px; font-weight: 800;
+    letter-spacing: -1px; color: var(--white);
+    display: block; margin-bottom: 6px;
+  }
+  .stat-val em { color: var(--sky); font-style: normal; }
+  .stat-label {
+    font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 60px;
+    border-top: 1px solid rgba(63,169,245,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 24px;
+    position: relative; z-index: 1;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .footer-logo span { color: var(--sky); }
+  .footer-copy {
+    font-size: 12px; color: rgba(240,244,255,0.25);
+    letter-spacing: 0.5px;
+  }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a {
+    font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(240,244,255,0.3);
+    text-decoration: none; transition: color .25s;
+  }
+  .footer-links a:hover { color: var(--sky); }
+  .footer-mark {
+    font-size: 10px; letter-spacing: 1px;
+    color: rgba(240,244,255,0.15);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+  .reveal-delay-4 { transition-delay: .4s; }
+
+  /* DIVIDER */
+  .section-divider {
+    width: 1px; height: 80px;
+    background: linear-gradient(180deg, transparent, rgba(63,169,245,0.4), transparent);
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  /* MOBILE NAV BURGER */
+  .nav-burger { display: none; flex-direction: column; gap: 5px; cursor: none; }
+  .nav-burger span { display: block; width: 24px; height: 1px; background: var(--white); transition: .3s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 28px; }
+    .nav-links { display: none; }
+    .nav-burger { display: flex; }
+    #hero { padding: 100px 28px 80px; }
+    #mockup, #formats, #why, #cta { padding: 80px 28px; }
+    footer { padding: 40px 28px; }
+    .sachet-group { gap: 14px; }
+    .s1 { width: 50px; height: 85px; }
+    .s2 { width: 52px; height: 125px; }
+    .s3 { width: 62px; height: 128px; }
+    .s4 { width: 72px; height: 155px; }
+    .sachet-vol { font-size: 16px; }
+    .mockup-stage { height: 360px; }
+    .stats-strip { flex-direction: column; }
+    .stat-item { border-right: none; border-bottom: 1px solid rgba(63,169,245,0.1); }
+    .stat-item:last-child { border-bottom: none; }
+    footer { flex-direction: column; align-items: flex-start; gap: 20px; }
+  }
+  @media (max-width: 500px) {
+    h1 { letter-spacing: -2px; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-ghost { width: 100%; max-width: 280px; text-align: center; }
+  }
+</style>
 </head>
 <body>
 
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo">Simple<span>Snap</span></a>
-    <ul class="nav-links">
-      <li><a href="#tecnologia">Snap Tech</a></li>
-      <li><a href="#como">Cómo funciona</a></li>
-      <li><a href="#tamaños">Tamaños</a></li>
-      <li><a href="#contacto">Contacto</a></li>
-    </ul>
-    <button class="nav-cta">Solicitar muestras</button>
-  </nav>
+<!-- GRID -->
+<div class="grid-bg"></div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-noise"></div>
-    <div class="hero-left">
-      <p class="hero-eyebrow">Snap Tech · México · Monodosis</p>
-      <h1 class="hero-title">
-        EL<br>
-        <span class="accent">FUTURO</span><br>
-        <span class="outline">DEL SACHET</span>
-      </h1>
-      <p class="hero-sub">
-        Una dosis perfecta, cada vez. Simple Snap redefine cómo el mundo consume lo que más le importa — sin desperdicio, sin compromiso.
-      </p>
-      <div class="hero-actions">
-        <a href="#contacto" class="btn-primary">Quiero ser parte</a>
-        <a href="#tecnologia" class="btn-ghost">Ver tecnología</a>
-      </div>
-    </div>
-    <div class="hero-right">
-      <div class="sachet-stack">
-        <div class="glow-orb"></div>
-        <div class="sachet-card back1">
-          <img src="DSC06742.jpg" alt="Sachet lifestyle" />
-        </div>
-        <div class="sachet-card back2">
-          <img src="DSC06776.jpg" alt="Sachet uso" />
-        </div>
-        <div class="sachet-card main">
-          <img src="3-IMG_5830.jpg" alt="Simple Snap sachet" />
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- NAV -->
+<nav id="nav">
+  <div class="logo">Simple<span>Snap</span></div>
+  <ul class="nav-links">
+    <li><a href="#mockup">Producto</a></li>
+    <li><a href="#formats">Formatos</a></li>
+    <li><a href="#why">Tecnología</a></li>
+    <li><a href="#cta">Contacto</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Solicitar muestras</a>
+  <div class="nav-burger" id="burger"><span></span><span></span><span></span></div>
+</nav>
 
-  <!-- MARQUEE -->
-  <div class="marquee-section">
-    <div class="marquee-track">
-      <span class="marquee-item">Snap Tech <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Monodosis <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">100% Reciclable <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Innovación México <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Zero Desperdicio <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Dosis Perfecta <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Simple Snap <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Snap Tech <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Monodosis <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">100% Reciclable <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Innovación México <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Zero Desperdicio <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Dosis Perfecta <span class="marquee-dot">·</span></span>
-      <span class="marquee-item">Simple Snap <span class="marquee-dot">·</span></span>
-    </div>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+  <div class="hero-orb orb-3"></div>
+
+  <div class="hero-badge">Tecnología monodosis · México</div>
+
+  <h1>Monodosis<br><em>del futuro</em></h1>
+  <p class="hero-sub">Precisión. Innovación. Cero desperdicio.</p>
+  <p class="hero-desc">Simple Snap redefine cómo las marcas entregan producto: formatos precisos, elegantes y sostenibles.</p>
+
+  <div class="hero-actions">
+    <a href="#cta" class="btn-primary">Solicitar muestras</a>
+    <a href="#formats" class="btn-ghost">Ver formatos</a>
   </div>
 
-  <!-- STATS -->
-  <div class="stats-section reveal">
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- STATS -->
+<div style="padding: 80px 60px 0; position:relative; z-index:1;">
+  <div class="stats-strip reveal">
     <div class="stat-item">
-      <div class="stat-number">0.5ml</div>
-      <div class="stat-label">Dosis mínima exacta</div>
+      <span class="stat-val">4<em>+</em></span>
+      <span class="stat-label">Formatos disponibles</span>
     </div>
     <div class="stat-item">
-      <div class="stat-number">100%</div>
-      <div class="stat-label">Material reciclable</div>
+      <span class="stat-val">0<em>%</em></span>
+      <span class="stat-label">Desperdicio</span>
     </div>
     <div class="stat-item">
-      <div class="stat-number">12ml</div>
-      <div class="stat-label">Capacidad máxima</div>
+      <span class="stat-val">12<em>ml</em></span>
+      <span class="stat-label">Capacidad máxima</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">MX<em>🇲🇽</em></span>
+      <span class="stat-label">Innovación local</span>
     </div>
   </div>
+</div>
 
-  <!-- HOW IT WORKS -->
-  <section class="section" id="como">
-    <div class="reveal">
-      <p class="section-eyebrow">Snap Tech</p>
-      <h2 class="section-title">TRES PASOS.<br>UNA REVOLUCIÓN.</h2>
-    </div>
-    <div class="steps-grid reveal">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <h3 class="step-title">Dobla</h3>
-        <p class="step-desc">El sachet se dobla fácilmente con una sola mano. El diseño ergonómico permite abrirlo sin esfuerzo, sin tijeras, sin complicaciones.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <h3 class="step-title">Snap</h3>
-        <p class="step-desc">Un clic preciso libera la dosis exacta. La tecnología Snap Tech garantiza que el contenido fluya de manera controlada, sin derrames.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <h3 class="step-title">Listo</h3>
-        <p class="step-desc">Disfruta tu producto al 100%. Sin residuos, sin merma. La dosis perfecta cada vez — porque tu producto vale demasiado para desperdiciarlo.</p>
-      </div>
-    </div>
-  </section>
+<!-- PRODUCT MOCKUP -->
+<section id="mockup">
+  <p class="section-label reveal">Diseño de producto</p>
+  <h2 class="section-title reveal">Ingeniería en<br><em style="font-style:normal; color: var(--sky)">cada mililitro</em></h2>
+  <p class="section-sub reveal">Tecnología de sellado patentada. Precisión farmacéutica. Estética premium lista para anaquel.</p>
 
-  <!-- FEATURES -->
-  <section class="section" id="tecnologia" style="padding-top:0">
-    <div class="features-layout">
-      <div class="features-image reveal">
-        <img src="DSC06776.jpg" alt="Simple Snap en uso" />
-        <div class="img-tag">Snap Tech · Patentado</div>
-      </div>
-      <div>
-        <div class="reveal">
-          <p class="section-eyebrow">Por qué Simple Snap</p>
-          <h2 class="section-title">DISEÑADO PARA<br>DESTACAR.</h2>
-        </div>
-        <div class="features-list">
-          <div class="feature-item reveal">
-            <div class="feature-icon">◈</div>
-            <div>
-              <h4 class="feature-title">Dosis exacta siempre</h4>
-              <p class="feature-desc">Cada sachet contiene exactamente lo que necesitas — ni más, ni menos. Adiós al desperdicio, hola a la precisión.</p>
-            </div>
-          </div>
-          <div class="feature-item reveal">
-            <div class="feature-icon">◎</div>
-            <div>
-              <h4 class="feature-title">Portabilidad total</h4>
-              <p class="feature-desc">Cabe en cualquier bolsillo, bolso o neceser. Lleva tu rutina a cualquier lugar sin comprometer el formato ni la calidad.</p>
-            </div>
-          </div>
-          <div class="feature-item reveal">
-            <div class="feature-icon">◉</div>
-            <div>
-              <h4 class="feature-title">100% reciclable</h4>
-              <p class="feature-desc">Material homopolímero innovador desarrollado por V-Shapes. Comprometido con el planeta sin sacrificar desempeño.</p>
-            </div>
-          </div>
-          <div class="feature-item reveal">
-            <div class="feature-icon">◆</div>
-            <div>
-              <h4 class="feature-title">Imagen premium</h4>
-              <p class="feature-desc">Impresión de alta definición que hace que tu marca brille. El sachet más cool que jamás hayas tenido en la mano.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <div class="mockup-stage reveal">
+    <div class="mockup-glow"></div>
 
-  <!-- SIZES -->
-  <div class="sizes-section" id="tamaños">
-    <div style="max-width:1400px;margin:0 auto;">
-      <div class="reveal">
-        <p class="section-eyebrow">Formatos disponibles</p>
-        <h2 class="section-title">ENCUENTRA<br>TU TAMAÑO.</h2>
+    <!-- PARTICLES -->
+    <div class="particle" style="left:20%; animation-duration:4s; animation-delay:0s; top:80%;"></div>
+    <div class="particle" style="left:35%; animation-duration:5s; animation-delay:1s; top:85%;"></div>
+    <div class="particle" style="left:55%; animation-duration:3.5s; animation-delay:.5s; top:80%;"></div>
+    <div class="particle" style="left:70%; animation-duration:4.5s; animation-delay:1.5s; top:75%;"></div>
+    <div class="particle" style="left:80%; animation-duration:4s; animation-delay:2s; top:80%;"></div>
+    <div class="particle" style="left:28%; animation-duration:6s; animation-delay:.2s; top:90%;"></div>
+    <div class="particle" style="left:62%; animation-duration:5.5s; animation-delay:.8s; top:88%;"></div>
+
+    <div class="sachet-group">
+      <div class="sachet s1">
+        <span class="sachet-logo">SS</span>
+        <span class="sachet-vol">1<sub style="font-size:10px">ml</sub></span>
+        <span class="sachet-dim">40×50</span>
+        <div class="sachet-shine"></div>
+        <div class="sachet-bottom-seal"></div>
       </div>
-      <div class="sizes-grid reveal">
-        <div class="size-card">
-          <div class="size-range">0.5 – 2ml</div>
-          <div class="size-dims">40 × 50 mm</div>
-          <div class="size-name">Micro · Muestras & Travel</div>
-        </div>
-        <div class="size-card featured">
-          <div class="size-range">1.5 – 3ml</div>
-          <div class="size-dims">40 × 80 mm</div>
-          <div class="size-name">Classic · El más versátil</div>
-        </div>
-        <div class="size-card">
-          <div class="size-range">1.5 – 5ml</div>
-          <div class="size-dims">50 × 80 mm</div>
-          <div class="size-name">Medium · Uso diario</div>
-        </div>
-        <div class="size-card">
-          <div class="size-range">4 – 12ml</div>
-          <div class="size-dims">60 × 100 mm</div>
-          <div class="size-name">Maxi · Nutrición & Wellness</div>
-        </div>
+      <div class="sachet s2">
+        <span class="sachet-logo">SS</span>
+        <span class="sachet-vol">3<sub style="font-size:11px">ml</sub></span>
+        <span class="sachet-dim">40×80</span>
+        <div class="sachet-shine"></div>
+        <div class="sachet-bottom-seal"></div>
+      </div>
+      <div class="sachet s3">
+        <span class="sachet-logo">SS</span>
+        <span class="sachet-vol">5<sub style="font-size:12px">ml</sub></span>
+        <span class="sachet-dim">50×80</span>
+        <div class="sachet-shine"></div>
+        <div class="sachet-bottom-seal"></div>
+      </div>
+      <div class="sachet s4">
+        <span class="sachet-logo">SS</span>
+        <span class="sachet-vol">12<sub style="font-size:13px">ml</sub></span>
+        <span class="sachet-dim">60×100</span>
+        <div class="sachet-shine"></div>
+        <div class="sachet-bottom-seal"></div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- GALLERY -->
-  <section class="section">
-    <div class="reveal">
-      <p class="section-eyebrow">En acción</p>
-      <h2 class="section-title" style="margin-bottom:3rem">EL SACHET<br>QUE SE NOTA.</h2>
+<div class="section-divider"></div>
+
+<!-- FORMATS -->
+<section id="formats">
+  <p class="section-label reveal" style="text-align:center;">Catálogo de formatos</p>
+  <h2 class="section-title reveal">Precisión<br>en cada <em style="font-style:normal; color:var(--sky)">formato</em></h2>
+  <p class="section-sub reveal">Cuatro tamaños diseñados para adaptarse a cualquier producto, industria y canal de distribución.</p>
+
+  <div class="formats-grid">
+    <div class="format-card reveal reveal-delay-1">
+      <div class="format-num">Formato 01</div>
+      <div class="format-vol">1<sub>ml</sub></div>
+      <div class="format-dim">40 × 50 mm</div>
+      <div class="format-bar"></div>
+      <span class="format-tag">Muestra express</span>
+      <div class="why-num">01</div>
     </div>
-    <div class="gallery-grid reveal">
-      <div class="gallery-item">
-        <img src="3-IMG_5830.jpg" alt="Sachet en bolso amarillo" />
-      </div>
-      <div class="gallery-item">
-        <img src="DSC06742.jpg" alt="Sachet lifestyle" />
-      </div>
-      <div class="gallery-item">
-        <img src="DSC06776.jpg" alt="Sachet aplicación" />
-      </div>
-      <div class="gallery-item">
-        <img src="DSC06776.jpg" alt="Sachet detail" />
-      </div>
-      <div class="gallery-item">
-        <img src="DSC06742.jpg" alt="Sachet uso femenino" />
-      </div>
-      <div class="gallery-item">
-        <img src="3-IMG_5830.jpg" alt="Simple Snap pack" />
-      </div>
+    <div class="format-card reveal reveal-delay-2">
+      <div class="format-num">Formato 02</div>
+      <div class="format-vol">3<sub>ml</sub></div>
+      <div class="format-dim">40 × 80 mm</div>
+      <div class="format-bar"></div>
+      <span class="format-tag">Uso diario</span>
+      <div class="why-num">02</div>
     </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="cta-section" id="contacto">
-    <h2 class="cta-title reveal">
-      ¿LISTO PARA<br>
-      <span style="color:var(--gold)">DIFERENCIARTE?</span>
-    </h2>
-    <p class="cta-sub reveal">
-      Únete a las marcas que ya entendieron que el futuro del packaging no es más grande — es más inteligente.
-    </p>
-    <div class="cta-form reveal">
-      <input class="cta-input" type="email" placeholder="tu@email.com" />
-      <button class="cta-btn">Quiero info</button>
+    <div class="format-card featured reveal reveal-delay-3">
+      <div class="format-num">Formato 03</div>
+      <div class="format-vol">5<sub>ml</sub></div>
+      <div class="format-dim">50 × 80 mm</div>
+      <div class="format-bar"></div>
+      <span class="format-tag">Premium dose</span>
+      <div class="why-num">03</div>
     </div>
-    <p style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);margin-top:1.5rem;text-transform:uppercase;" class="reveal">
-      Sin spam · Solo lo que importa
-    </p>
-  </section>
+    <div class="format-card reveal reveal-delay-4">
+      <div class="format-num">Formato 04</div>
+      <div class="format-vol">12<sub>ml</sub></div>
+      <div class="format-dim">60 × 100 mm</div>
+      <div class="format-bar"></div>
+      <span class="format-tag">Max capacity</span>
+      <div class="why-num">04</div>
+    </div>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Simple<span>Snap</span></div>
-    <p class="footer-copy">© 2025 Simple Snap · Snap Tech · México</p>
-    <ul class="footer-links">
-      <li><a href="#">Privacidad</a></li>
-      <li><a href="#">Contacto</a></li>
-      <li><a href="https://v-shapes.com" target="_blank">V-Shapes</a></li>
-    </ul>
-  </footer>
+<div class="section-divider"></div>
 
-  <script>
-    // Custom cursor
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
+<!-- WHY -->
+<section id="why">
+  <p class="section-label reveal" style="text-align:center;">Por qué Simple Snap</p>
+  <h2 class="section-title reveal" style="margin-bottom:60px;">La diferencia<br>que se <em style="font-style:normal; color:var(--sky)">siente</em></h2>
 
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+  <div class="why-grid">
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="20" stroke="#3FA9F5" stroke-width="1" opacity=".3"/>
+          <path d="M24 8 L24 16 M24 32 L24 40 M8 24 L16 24 M32 24 L40 24" stroke="#3FA9F5" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+          <circle cx="24" cy="24" r="6" fill="none" stroke="#3FA9F5" stroke-width="1.5"/>
+          <circle cx="24" cy="24" r="2" fill="#3FA9F5"/>
+        </svg>
+      </div>
+      <div class="why-title">Cero desperdicio</div>
+      <div class="why-desc">Cada sachet entrega la dosis exacta. Sin residuos, sin merma, sin contaminación cruzada. Sostenibilidad y economía en un solo formato.</div>
+      <div class="why-num">01</div>
+    </div>
+    <div class="why-card reveal reveal-delay-1">
+      <div class="why-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="8" width="24" height="32" rx="2" stroke="#3FA9F5" stroke-width="1" opacity=".3"/>
+          <path d="M18 18 L30 18 M18 24 L26 24 M18 30 L28 30" stroke="#3FA9F5" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M32 36 L40 44" stroke="#3FA9F5" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="30" cy="34" r="5" stroke="#3FA9F5" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="why-title">Precisión exacta</div>
+      <div class="why-desc">Tecnología de sellado de alta precisión garantiza el volumen exacto en cada unidad. Tolerancia mínima. Consistencia máxima.</div>
+      <div class="why-num">02</div>
+    </div>
+    <div class="why-card reveal reveal-delay-2">
+      <div class="why-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 6 L38 14 L38 30 L24 42 L10 30 L10 14 Z" stroke="#3FA9F5" stroke-width="1" opacity=".3"/>
+          <path d="M24 14 L31 18 L31 28 L24 34 L17 28 L17 18 Z" stroke="#3FA9F5" stroke-width="1.5"/>
+          <circle cx="24" cy="24" r="3" fill="#3FA9F5"/>
+        </svg>
+      </div>
+      <div class="why-title">Innovación en México</div>
+      <div class="why-desc">Tecnología de clase mundial desarrollada y operada desde México. Soporte local, entrega ágil, alineación con el mercado mexicano.</div>
+      <div class="why-num">03</div>
+    </div>
+    <div class="why-card reveal reveal-delay-3">
+      <div class="why-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 8 C24 8 10 16 10 26 C10 33.7 16.3 40 24 40 C31.7 40 38 33.7 38 26 C38 16 24 8 24 8Z" stroke="#3FA9F5" stroke-width="1" opacity=".3"/>
+          <path d="M24 16 C24 16 16 21 16 27 C16 31.4 19.6 35 24 35 C28.4 35 32 31.4 32 27 C32 21 24 16 24 16Z" stroke="#3FA9F5" stroke-width="1.5"/>
+          <path d="M20 24 L23 27 L28 21" stroke="#3FA9F5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="why-title">Experiencia premium</div>
+      <div class="why-desc">El packaging es parte de la experiencia de marca. Cada sachet Simple Snap transmite calidad, higiene y sofisticación al consumidor final.</div>
+      <div class="why-num">04</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-line"></div>
+  <p class="section-label reveal">¿Listo para innovar?</p>
+  <h2 class="cta-title reveal">Tu marca.<br><em style="font-style:normal; color:var(--sky)">Redefinida.</em></h2>
+  <p class="cta-sub reveal">Solicita tus muestras gratuitas y descubre<br>la diferencia Simple Snap en tu línea de producto.</p>
+  <div class="cta-actions reveal">
+    <a href="mailto:hola@simplesnap.mx" class="btn-primary">Solicitar muestras</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Simple<span>Snap</span></div>
+  <div class="footer-links">
+    <a href="#mockup">Producto</a>
+    <a href="#formats">Formatos</a>
+    <a href="#why">Tecnología</a>
+    <a href="mailto:hola@simplesnap.mx">Contacto</a>
+  </div>
+  <div class="footer-copy">© 2025 Simple Snap · México</div>
+  <div class="footer-mark">Monodosis del Futuro™</div>
+</footer>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button, .format-card, .why-card, .sachet, .stat-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px'; cursor.style.height = '20px';
+      ring.style.width = '60px'; ring.style.height = '60px';
     });
-
-    function animateRing() {
-      rx += (mx - rx) * 0.12;
-      ry += (my - ry) * 0.12;
-      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
-      requestAnimationFrame(animateRing);
-    }
-    animateRing();
-
-    document.querySelectorAll('a, button, .feature-item, .step-card, .size-card').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.transform += ' scale(1.8)';
-        cursor.style.background = 'var(--neon)';
-        ring.style.opacity = '0';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.background = 'var(--gold)';
-        ring.style.opacity = '0.5';
-      });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px'; cursor.style.height = '12px';
+      ring.style.width = '40px'; ring.style.height = '40px';
     });
+  });
 
-    // Scroll reveal
-    const revealEls = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          observer.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    revealEls.forEach(el => observer.observe(el));
-  </script>
+  // NAV SCROLL
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
 
+  // REVEAL ON SCROLL
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => obs.observe(el));
+
+  // SMOOTH ANCHOR
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // BURGER MENU (mobile)
+  const burger = document.getElementById('burger');
+  const navLinks = document.querySelector('.nav-links');
+  burger.addEventListener('click', () => {
+    const open = navLinks.style.display === 'flex';
+    navLinks.style.display = open ? 'none' : 'flex';
+    navLinks.style.flexDirection = 'column';
+    navLinks.style.position = 'fixed';
+    navLinks.style.top = '72px';
+    navLinks.style.left = '0'; navLinks.style.right = '0';
+    navLinks.style.background = 'rgba(2,4,8,0.97)';
+    navLinks.style.padding = '32px';
+    navLinks.style.gap = '24px';
+    navLinks.style.backdropFilter = 'blur(20px)';
+    navLinks.style.borderBottom = '1px solid rgba(63,169,245,0.1)';
+  });
+
+  // PARTICLES ANIMATION
+  const particles = document.querySelectorAll('.particle');
+  particles.forEach((p, i) => {
+    p.style.animationDelay = (i * 0.6) + 's';
+  });
+</script>
 </body>
 </html>
